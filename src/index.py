@@ -19,9 +19,9 @@ class Record():
 # vyhlada zadany retazec
 def search(index):
 
-    res = es.search(index=index.lower(), body={"query": {"match_all": {}}})
+    res = es.get(index='record_idx', id=index.lower())
     
-    return res['hits']['hits']
+    return res
 
 
 # zaindexuje riadky zo suboru
@@ -37,14 +37,12 @@ def index_file(file_name):
 
             record = Record(subject[0], subject[1][:-1], relation[1][:-1], object[0], object[1][:-1])
 
-            index = record.subject.lower() 
-            index = re.sub('[ \"*<|,>/?:]', '', index)  # odstrani znaky, ktore su zakazane v ES indexe
-            index = re.sub('_\(.*\)', '', index)    # odstrani doplnujucu informaciu z indexu napr. Goo_(album) bude len Goo
+            id = record.subject.lower() 
+            id = re.sub('[ \"*<|,>/?:]', '', id)  # odstrani znaky, ktore su zakazane v ES indexe
+            id = re.sub('_\(.*\)', '', id)    # odstrani doplnujucu informaciu z indexu napr. Goo_(album) bude len Goo
 
-            # print(f"indexing #{count} {index}")
-
-            es.index(index=index, id=count, body=record.toJSON())
-            es.indices.refresh(index=index)
+            es.index(index='record_idx', id=id, body=record.toJSON())
+            # break
 
 
 es = Elasticsearch()

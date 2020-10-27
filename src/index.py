@@ -20,23 +20,6 @@ class Record():
         return self.__dict__
 
 
-# vyhlada zadany retazec
-def search(record_name):
-    record_name = record_name.lower() 
-    record_name = re.sub('[ \"*<|,>/?:]', '', record_name)
-    
-    body = {
-        'query': {
-            'match': {
-                'name': record_name
-            }
-        }
-    }
-    res = es.search(index="record_idx", body=body)
-
-    return res['hits']['hits']
-
-
 def index_data(file_name, index_name):
 
     with open(f"data/{file_name}", encoding='utf-8') as file:    
@@ -66,7 +49,6 @@ def index_data(file_name, index_name):
 
             es.index(index=index_name, id=count, body=record.toJSON())
             # print(record.toJSON())
-
 
 
 es = Elasticsearch()

@@ -1,6 +1,12 @@
 from elasticsearch import Elasticsearch
 import re
 
+# vypise pocet zaznamov v danom indexe
+def get_num_docs(index_name):
+    es.indices.refresh(index_name)
+    print(es.cat.count(index_name, params={"format": "json"}))
+
+
 # vyhlada zadany retazec
 def search(record_name):
     record_name = record_name.lower() 
@@ -8,7 +14,7 @@ def search(record_name):
     
     body = {
         'query': {
-            'match': {
+            'match_all': {
                 'name': record_name
             }
         }
@@ -20,11 +26,10 @@ def search(record_name):
 
 es = Elasticsearch()
 
-
 query = input('Co hladas? ')
 
 ret = search(query)
-
+print(len(ret))
 subjects = set()
 for hit in ret:
     subject = hit['_source']['subject']

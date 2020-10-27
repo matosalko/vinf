@@ -1,9 +1,7 @@
 import re
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, helpers
 import os
-
 from time import time
-
 
 class Record():
 
@@ -46,9 +44,11 @@ def index_data(file_name, index_name):
                 object = re.findall('\".*\"', line)
                 record = Record(subject[0], subject[1][:-1], relation[1][:-1], 'text', object[0], id)
             
-
-            es.index(index=index_name, id=count, body=record.toJSON())
-            # print(record.toJSON())
+            yield {
+                "_index": index_name,
+                "_id": count,
+                "_source": record.toJSON(),
+            }
 
 
 es = Elasticsearch()
@@ -63,7 +63,7 @@ for file in all_files:
     index_name = index_name.lower()
 
     start = time()
-    index_data(file, index_name)
+    helpers.bulk(es, index_data(file, index_name))
     end = time()
 
     print(f"time needed for indexing: {end - start}")

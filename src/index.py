@@ -22,7 +22,7 @@ class Record():
 
 def index_data(file_name, index_name):
 
-    with open(f"data/{file_name}", encoding='utf-8') as file:    
+    with open(f"data_100000/{file_name}", encoding='utf-8') as file:    
         for count, line in enumerate(file):
             
             if re.findall('_:', line):  # ignoruje riadky, ktore nie su reprezentovane ako N-triple
@@ -53,7 +53,7 @@ def index_data(file_name, index_name):
 
 es = Elasticsearch()
 cwd = os.getcwd()
-all_files = os.listdir(f"{cwd}/data")
+all_files = os.listdir(f"{cwd}/data_100000")
 
 for file in all_files:
     print(f"indexing file: {file}")

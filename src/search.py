@@ -19,3 +19,24 @@ def search(record_name):
 
 
 es = Elasticsearch()
+
+
+query = input('Co hladas? ')
+
+ret = search(query)
+
+subjects = set()
+for hit in ret:
+    subject = hit['_source']['subject']
+    subjects.add(subject)
+
+subs = []
+for i in subjects:
+    subs.append(i)
+
+for i, sub in enumerate(subs):
+    print(f"[{i}] {sub}")
+
+query = int(input('Vyber zo zoznamu: '))
+
+print(subs[query])

@@ -19,7 +19,7 @@ def search(record_name):
             }
         }
     }
-    res = es.search(index="facts_idx", body=body)
+    res = es.search(index="facts_idx", body=body, size=100)
 
     return res['hits']['hits']
 
@@ -29,7 +29,7 @@ es = Elasticsearch()
 query = input('Co hladas? ')
 
 ret = search(query)
-print(len(ret))
+
 subjects = set()
 for hit in ret:
     subject = hit['_source']['subject']
@@ -45,3 +45,5 @@ for i, sub in enumerate(subs):
 query = int(input('Vyber zo zoznamu: '))
 
 print(subs[query])
+
+# get_num_docs('sameas_idx')

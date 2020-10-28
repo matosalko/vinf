@@ -26,6 +26,9 @@ def index_data(file_name, index_name):
             if re.findall('_:', line):  # ignoruje riadky, ktore nie su reprezentovane ako N-triple
                 continue
 
+            if re.findall('<geo:', line):   # upravi sa riadok s geo suradnicami, aby bol dalej parsovatelny
+                line = re.sub('<geo:', '<http://geo/', line)
+
             line = re.sub('#', '/', line)
             results = re.findall('[^/]*/[^/]*>', line)
 
@@ -39,10 +42,11 @@ def index_data(file_name, index_name):
             if len(results) == 3:
                 # ak sa jedna o link na wikidata, tu sa vyparsuje
                 if relation[0] + relation[1] == 'owlsameAs>':
-                    object = re.findall('<http://www.wikidata.*>', line)
+                    object = re.findall('<http://(www.wikidata.*>|dbpedia.*>|rdf.freebase.*>)', line)
+
                     object = object[0][1:-1]
                     record = Record(subject[0], subject[1][:-1], relation[1][:-1], 'link', object, id)
-                
+
                 else:    
                     object = results[2].split('/')
                     record = Record(subject[0], subject[1][:-1], relation[1][:-1], object[0], object[1][:-1], id)
@@ -51,6 +55,7 @@ def index_data(file_name, index_name):
                 object = re.findall('\".*\"', line)
                 record = Record(subject[0], subject[1][:-1], relation[1][:-1], 'text', object[0], id)
             
+            # print(record.toJSON())
             yield {
                 "_index": index_name,
                 "_id": count,
@@ -70,7 +75,7 @@ for file in all_files:
     index_name = index_name.lower()
 
     start = time()
-    helpers.bulk(es, index_data(file, index_name))
+    helpers.bulk(es, index_data(file, index_name))  # zaindexuje jednotlive riadky
     end = time()
 
     print(f"time needed for indexing: {end - start}")

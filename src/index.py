@@ -20,7 +20,7 @@ class Record():
 
 def index_data(file_name, index_name):
 
-    with open(f"data_100000/{file_name}", encoding='utf-8') as file:    
+    with open(f"data_all/{file_name}", encoding='utf-8') as file:    
         for count, line in enumerate(file):
             
             if re.findall('_:', line):  # ignoruje riadky, ktore nie su reprezentovane ako N-triple
@@ -37,8 +37,15 @@ def index_data(file_name, index_name):
             id = re.sub('_\(.*\)', '', id)    # odstrani doplnujucu informaciu napr. Goo_(album) bude len Goo
 
             if len(results) == 3:
-                object = results[2].split('/')
-                record = Record(subject[0], subject[1][:-1], relation[1][:-1], object[0], object[1][:-1], id)
+                # ak sa jedna o link na wikidata, tu sa vyparsuje
+                if relation[0] + relation[1] == 'owlsameAs>':
+                    object = re.findall('<http://www.wikidata.*>', line)
+                    object = object[0][1:-1]
+                    record = Record(subject[0], subject[1][:-1], relation[1][:-1], 'link', object, id)
+                
+                else:    
+                    object = results[2].split('/')
+                    record = Record(subject[0], subject[1][:-1], relation[1][:-1], object[0], object[1][:-1], id)
             
             else:
                 object = re.findall('\".*\"', line)
@@ -53,7 +60,7 @@ def index_data(file_name, index_name):
 
 es = Elasticsearch()
 cwd = os.getcwd()
-all_files = os.listdir(f"{cwd}/data_100000")
+all_files = os.listdir(f"{cwd}/data_all")
 
 for file in all_files:
     print(f"indexing file: {file}")

@@ -2,4 +2,5 @@
 *.pyc
 data_all/
 tmp/
-data_100000/
+data_bigger/
+sdata.sh

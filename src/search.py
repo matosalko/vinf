@@ -14,7 +14,7 @@ def search(record_name):
     
     body = {
         'query': {
-            'match_all': {
+            'match': {
                 'name': record_name
             }
         }

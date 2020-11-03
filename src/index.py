@@ -54,8 +54,7 @@ def index_data(file_name, index_name):
             else:
                 object = re.findall('\".*\"', line)
                 record = Record(subject[0], subject[1][:-1], relation[1][:-1], 'text', object[0], id)
-            
-            # print(record.toJSON())
+                         
             yield {
                 "_index": index_name,
                 "_id": count,

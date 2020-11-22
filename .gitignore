@@ -4,3 +4,4 @@ data_all/
 tmp/
 data_bigger/
 sdata.sh
+*.md

@@ -59,7 +59,7 @@ def index_data(file_name, index_name):
                     record = Record(subject[0], subject[1][:-1], relation[1][:-1], object[0], object[1][:-1], id)
             
             else:
-                object = re.findall('\".*\"@[a-zA-Z]*', line)
+                object = re.findall('\".*\"', line)              
                 record = Record(subject[0], subject[1][:-1], relation[1][:-1], 'text', object[0], id)
                          
             yield {
@@ -88,4 +88,4 @@ all_files = os.listdir(f"{cwd}/data_all")
 
 helpers.bulk(es, index_data('yago-wd-sameAs.nt', 'sameas_idx'))
 
-# index_data('yago-wd-sameAs.nt', 'jano')
+# index_data('yago-wd-facts.nt', 'jano')

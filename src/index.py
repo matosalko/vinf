@@ -73,19 +73,15 @@ es = Elasticsearch()
 cwd = os.getcwd()
 all_files = os.listdir(f"{cwd}/data_all")
 
-# for file in all_files:
-#     print(f"indexing file: {file}")
+for file in all_files:
+    print(f"indexing file: {file}")
 
-#     index_name = re.findall('[^-.*]*\.nt', file)
-#     index_name = re.sub('.nt', '_idx', index_name[0])
-#     index_name = index_name.lower()
+    index_name = re.findall('[^-.*]*\.nt', file)
+    index_name = re.sub('.nt', '_idx', index_name[0])
+    index_name = index_name.lower()
 
-#     start = time()
-#     helpers.bulk(es, index_data(file, index_name))  # zaindexuje jednotlive riadky
-#     end = time()
+    start = time()
+    helpers.bulk(es, index_data(file, 'yago_idx'))  # zaindexuje jednotlive riadky
+    end = time()
 
-#     print(f"time needed for indexing: {end - start}")
-
-helpers.bulk(es, index_data('yago-wd-sameAs.nt', 'sameas_idx'))
-
-# index_data('yago-wd-facts.nt', 'jano')
+    print(f"time needed for indexing: {end - start}")

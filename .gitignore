@@ -5,3 +5,5 @@ tmp/
 data_bigger/
 sdata.sh
 *.md
+*.json
+*.ipynb

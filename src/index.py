@@ -2,9 +2,9 @@ import re
 from elasticsearch import Elasticsearch, helpers
 import os
 from time import time
-from pprint import pprint
 
 class Record():
+    """Objekt reprezentujuci jeden zaznam, ktory sa bude indexovat"""
 
     def __init__(self, sub_type, subject, relation, obj_type, object, name):
         self.sub_type = sub_type
@@ -13,16 +13,25 @@ class Record():
         self.obj_type = obj_type
         self.object = object
     
-        self.name = name    # na zaklade tohto atributu sa bude dany zaznam vyhladavat
+        self.name = name
 
     def toJSON(self):
         return self.__dict__
 
 
 def index_data(file_name, index_name):
+    """Funkcia, ktora parsuje vstupny file po riadkoch a vytvara z nich objekty, ktore sa maju zaindexovat
+
+    Args:
+        file_name (string): nazov suboru, ktory sa ma spracovat
+        index_name (string): nazov indexu, pod ktory sa maju jednotlive zaznamy indexovat
+
+    Yields:
+        dict: elasticsearch query, pomozou ktoreho sa zaindexuje prave jeden zaznam
+    """
 
     with open(f"data_all/{file_name}", encoding='utf-8') as file:    
-        for count, line in enumerate(file):
+        for line in file:
             
             if re.findall('_:', line):  # ignoruje riadky, ktore nie su reprezentovane ako N-triple
                 continue
@@ -61,10 +70,9 @@ def index_data(file_name, index_name):
             else:
                 object = re.findall('\".*\"', line)              
                 record = Record(subject[0], subject[1][:-1], relation[1][:-1], 'text', object[0], id)
-                         
+
             yield {
                 "_index": index_name,
-                "_id": count,
                 "_source": record.toJSON(),
             }
 
@@ -75,10 +83,6 @@ all_files = os.listdir(f"{cwd}/data_all")
 
 for file in all_files:
     print(f"indexing file: {file}")
-
-    index_name = re.findall('[^-.*]*\.nt', file)
-    index_name = re.sub('.nt', '_idx', index_name[0])
-    index_name = index_name.lower()
 
     start = time()
     helpers.bulk(es, index_data(file, 'yago_idx'))  # zaindexuje jednotlive riadky
